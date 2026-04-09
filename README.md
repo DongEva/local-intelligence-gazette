@@ -1,7 +1,15 @@
 # Local Intelligence Gazette · 本地情报雷达
 
+**Your personal AI-powered local news agency — built around the places you actually care about.**
+
+Pin your home, your office, or anywhere else. Set the radius. Get a curated intelligence briefing — daily digest, weekly roundup, or instant alerts — tailored entirely to your patch of the world.
+
 > *The most important news in the world? What's happening right outside your door.*
->
+
+**你专属的 AI 本地新闻社 —— 以你关心的地方为中心运转。**
+
+定位你家、公司、或任何你在意的地点，控制关注的区域范围，让 AI 为你输出专属的本地情报 —— 日报、周报、即时预警，只关于你的那一片地方。
+
 > *世界上最重要的新闻？就是你家门口正在发生的事。*
 
 ![UI](https://img.shields.io/badge/UI-Retro%20Pixel%20Newspaper-8b1a1a?style=flat-square) ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
