@@ -1,0 +1,27 @@
+{
+  "location": {
+    "lat": 39.9042,
+    "lon": 116.4074,
+    "city": "Beijing",
+    "district": "Chaoyang",
+    "radius_km": 5
+  },
+  "interests": {
+    "housing": 0.9,
+    "traffic": 0.8,
+    "safety": 1.0,
+    "environment": 0.7,
+    "commerce": 0.5,
+    "community": 0.6
+  },
+  "thresholds": {
+    "immediate_alert": 80,
+    "daily_digest": 50
+  },
+  "api_keys": {
+    "openweather": "YOUR_OPENWEATHER_KEY",
+    "newsapi": "YOUR_NEWSAPI_KEY",
+    "deepseek": "YOUR_DEEPSEEK_KEY"
+  },
+  "language": "zh"
+}

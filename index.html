@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本地情报周报 · LOCAL INTELLIGENCE GAZETTE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=UnifrakturMaguntia&display=swap');
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper: #f2ead6;
+  --paper-dark: #e8dcc0;
+  --paper-aged: #d4c89a;
+  --ink: #1a1008;
+  --ink-fade: #4a3c28;
+  --ink-light: #7a6a50;
+  --red-ink: #8b1a1a;
+  --blue-ink: #1a3a5c;
+  --rule: #2a1e0a;
+  --pixel: 2px;
+}
+
+html { font-size: 16px; }
+
+body {
+  background: #2a2218;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,.08) 3px, rgba(0,0,0,.08) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0,0,0,.04) 3px, rgba(0,0,0,.04) 4px);
+  min-height: 100vh;
+  padding: 24px 12px 60px;
+  font-family: 'Noto Serif SC', 'SimSun', serif;
+  image-rendering: pixelated;
+}
+
+/* ── Newspaper page ── */
+.newspaper {
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--paper);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  border: 3px solid var(--rule);
+  box-shadow: 6px 6px 0 #1a1008, 12px 12px 0 rgba(0,0,0,.3);
+  position: relative;
+}
+
+/* paper texture overlay */
+.newspaper::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 23px,
+    rgba(42,30,10,.06) 23px, rgba(42,30,10,.06) 24px
+  );
+  z-index: 0;
+}
+
+.newspaper > * { position: relative; z-index: 1; }
+
+/* ── Masthead ── */
+.masthead {
+  border-bottom: 4px double var(--rule);
+  padding: 16px 24px 12px;
+  text-align: center;
+  background: var(--paper);
+}
+
+.masthead-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 9px;
+  color: var(--ink-fade);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  font-family: 'Courier New', monospace;
+}
+
+.masthead-flag {
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: -1px;
+  line-height: 1;
+  font-family: 'Noto Serif SC', serif;
+  text-shadow: 2px 2px 0 rgba(0,0,0,.15);
+}
+
+.masthead-sub {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink-fade);
+  margin-top: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.masthead-rule {
+  height: 1px; background: var(--rule); margin: 8px 0 4px;
+}
+.masthead-rule.thick { height: 3px; margin-bottom: 0; }
+
+/* ── Config panel (collapsible) ── */
+.config-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  border-bottom: 1px solid var(--paper-aged);
+  cursor: pointer;
+  user-select: none;
+  background: var(--paper-dark);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-fade);
+  font-family: 'Courier New', monospace;
+}
+.config-toggle:hover { background: var(--paper-aged); }
+.config-arrow { transition: transform .3s; font-size: 10px; }
+.config-arrow.open { transform: rotate(180deg); }
+
+.config-panel {
+  padding: 0 24px;
+  border-bottom: 2px solid var(--rule);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .4s ease, padding .3s;
+}
+.config-panel.open {
+  max-height: 1200px;
+  padding: 20px 24px;
+}
+
+/* ── Form elements (pixel style) ── */
+.config-section {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--paper-aged);
+}
+.config-section:last-child { border-bottom: none; margin-bottom: 0; }
+
+.section-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink-fade);
+  font-family: 'Courier New', monospace;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--paper-aged);
+}
+
+.field { margin-bottom: 10px; }
+.field label {
+  display: block;
+  font-size: 10px;
+  color: var(--ink-fade);
+  margin-bottom: 4px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+.pixel-input {
+  width: 100%;
+  background: #fffef5;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  font-size: 13px;
+  padding: 6px 10px;
+  outline: none;
+  font-family: 'Courier New', monospace;
+  box-shadow: 2px 2px 0 var(--ink);
+  transition: box-shadow .1s;
+}
+.pixel-input:focus {
+  box-shadow: 3px 3px 0 var(--red-ink);
+  border-color: var(--red-ink);
+}
+.pixel-input::placeholder { color: var(--ink-light); }
+
+.addr-wrap { position: relative; }
+.addr-wrap .pixel-input { padding-right: 38px; }
+.geo-btn {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  background: var(--ink); border: none; cursor: pointer;
+  color: var(--paper); font-size: 13px; padding: 2px 5px;
+  font-family: 'Courier New', monospace;
+  line-height: 1;
+}
+.geo-btn:hover { background: var(--red-ink); }
+
+.addr-note {
+  font-size: 10px; color: var(--ink-light);
+  margin-top: 3px; font-family: 'Courier New', monospace;
+}
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* radius display */
+.radius-display {
+  display: flex; align-items: center; gap: 10px; margin-top: 4px;
+}
+.radius-display input[type=range] {
+  flex: 1; accent-color: var(--ink);
+  height: 3px; cursor: pointer; padding: 0;
+}
+.radius-val {
+  font-family: 'Courier New', monospace;
+  font-size: 13px; font-weight: bold; color: var(--red-ink);
+  min-width: 40px;
+}
+
+/* slider grid */
+.slider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-row label {
+  font-size: 11px; color: var(--ink); margin: 0;
+  min-width: 64px; font-family: 'Courier New', monospace;
+}
+.slider-row input[type=range] {
+  flex: 1; accent-color: var(--red-ink); height: 3px; padding: 0; cursor: pointer;
+}
+.slider-val {
+  font-size: 11px; font-family: 'Courier New', monospace;
+  color: var(--red-ink); min-width: 26px; text-align: right; font-weight: bold;
+}
+
+/* mode tabs */
+.mode-tabs { display: flex; gap: 0; }
+.mode-tab {
+  flex: 1; padding: 8px 4px; text-align: center;
+  cursor: pointer; font-size: 11px;
+  border: 2px solid var(--ink);
+  border-right-width: 0;
+  background: #fffef5;
+  color: var(--ink-fade);
+  transition: all .1s;
+  user-select: none;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
+.mode-tab:last-child { border-right-width: 2px; }
+.mode-tab.active {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: bold;
+}
+.mode-tab:hover:not(.active) { background: var(--paper-dark); }
+
+/* cmd box */
+.cmd-wrap {
+  background: #1a1008;
+  border: 2px solid var(--ink);
+  padding: 10px 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #d4c89a;
+  position: relative;
+  box-shadow: 3px 3px 0 var(--ink);
+  word-break: break-all;
+  line-height: 1.5;
+}
+.copy-btn {
+  position: absolute; right: 6px; top: 6px;
+  background: var(--paper-aged); border: 1px solid var(--ink-fade);
+  color: var(--ink); font-size: 10px; padding: 2px 7px;
+  cursor: pointer; font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+.copy-btn:hover { background: var(--red-ink); color: var(--paper); border-color: var(--red-ink); }
+
+/* ── PRINT button ── */
+.print-btn-wrap { padding: 16px 24px; border-bottom: 2px solid var(--rule); }
+.print-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 var(--ink-fade);
+  transition: box-shadow .1s, transform .1s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.print-btn:hover { box-shadow: 2px 2px 0 var(--ink-fade); transform: translate(2px,2px); }
+.print-btn:active { box-shadow: 0 0 0 var(--ink-fade); transform: translate(4px,4px); }
+.print-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: 4px 4px 0 var(--ink-fade); }
+
+/* pixel spinner */
+@keyframes pixelspin {
+  0%   { content: '[ ▮   ]'; }
+  25%  { content: '[  ▮  ]'; }
+  50%  { content: '[   ▮ ]'; }
+  75%  { content: '[  ▮  ]'; }
+  100% { content: '[ ▮   ]'; }
+}
+.pix-loader {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  animation: blink .6s step-end infinite;
+  letter-spacing: 2px;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── Results: Newspaper layout ── */
+#results { display: none; }
+
+.section-rule {
+  padding: 0 24px;
+  margin: 0;
+}
+.section-rule hr {
+  border: none;
+  border-top: 3px double var(--rule);
+  margin: 0;
+}
+
+/* edition dateline */
+.edition-line {
+  padding: 6px 24px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--ink-fade);
+  font-family: 'Courier New', monospace;
+  border-bottom: 1px solid var(--paper-aged);
+  text-transform: uppercase;
+}
+
+/* stats ticker */
+.ticker {
+  padding: 5px 24px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+  display: flex; gap: 24px; flex-wrap: wrap;
+}
+.ticker-item { white-space: nowrap; }
+.ticker-hi { color: #ff9999; font-weight: bold; }
+.ticker-mid { color: #ffd080; font-weight: bold; }
+.ticker-lo { color: #90e890; font-weight: bold; }
+
+/* AI summary — column layout */
+.summary-section {
+  padding: 16px 24px;
+  border-bottom: 2px solid var(--rule);
+}
+.col-head {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink-fade);
+  font-family: 'Courier New', monospace;
+  border-bottom: 1px solid var(--paper-aged);
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+.summary-text {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--ink);
+  white-space: pre-wrap;
+  columns: 2;
+  column-gap: 24px;
+  column-rule: 1px solid var(--paper-aged);
+}
+@media (max-width: 540px) { .summary-text { columns: 1; } }
+
+/* drop cap */
+.summary-text::first-letter {
+  font-size: 3.5em;
+  font-weight: 900;
+  float: left;
+  line-height: .75;
+  margin: 4px 6px 0 0;
+  color: var(--ink);
+}
+
+/* ── Event articles ── */
+.articles-section {
+  padding: 0 24px 24px;
+}
+
+.articles-head {
+  padding: 10px 0 6px;
+  border-bottom: 2px solid var(--rule);
+  margin-bottom: 0;
+  display: flex; align-items: baseline; gap: 12px;
+}
+.articles-head h2 {
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-family: 'Courier New', monospace;
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+@media (max-width: 560px) { .article-grid { grid-template-columns: 1fr; } }
+
+.article {
+  padding: 14px 16px 14px 0;
+  border-bottom: 1px solid var(--paper-aged);
+  border-right: 1px solid var(--paper-aged);
+  cursor: default;
+}
+.article:nth-child(even) { padding-left: 16px; padding-right: 0; border-right: none; }
+.article:nth-last-child(-n+2) { border-bottom: none; }
+
+/* priority bar — left accent */
+.article.pri-high { border-left: 3px solid var(--red-ink); padding-left: 13px; }
+.article.pri-mid  { border-left: 3px solid var(--blue-ink); padding-left: 13px; }
+.article.pri-high:nth-child(even) { padding-left: 13px; }
+.article.pri-mid:nth-child(even)  { padding-left: 13px; }
+
+.article-kicker {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.kicker-high { color: var(--red-ink); }
+.kicker-mid  { color: var(--blue-ink); }
+.kicker-low  { color: var(--ink-light); }
+
+.article-hed {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 5px;
+  font-family: 'Noto Serif SC', serif;
+  cursor: pointer;
+  transition: color .15s;
+}
+.article-hed:hover { color: var(--red-ink); text-decoration: underline; }
+.article-hed a {
+  color: inherit;
+  text-decoration: none;
+}
+.article-hed a:hover { color: var(--red-ink); text-decoration: underline; }
+
+.article-dek {
+  font-size: 11px;
+  color: var(--ink-fade);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+
+.article-byline {
+  font-size: 9px;
+  color: var(--ink-light);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 4px;
+}
+
+.score-dots {
+  display: inline-flex; gap: 2px; align-items: center;
+}
+.score-dot {
+  width: 5px; height: 5px;
+  background: var(--paper-aged);
+  display: inline-block;
+  image-rendering: pixelated;
+}
+.score-dot.filled-high { background: var(--red-ink); }
+.score-dot.filled-mid  { background: var(--blue-ink); }
+.score-dot.filled-low  { background: var(--ink-light); }
+
+/* source link tag */
+.src-link {
+  display: inline-block;
+  font-size: 9px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  border: 1px solid currentColor;
+  padding: 1px 5px;
+  text-decoration: none;
+  transition: background .1s;
+}
+.src-link.high { color: var(--red-ink); }
+.src-link.high:hover { background: var(--red-ink); color: var(--paper); }
+.src-link.mid  { color: var(--blue-ink); }
+.src-link.mid:hover  { background: var(--blue-ink); color: var(--paper); }
+.src-link.low  { color: var(--ink-light); }
+.src-link.low:hover  { background: var(--ink-light); color: var(--paper); }
+
+/* ── Footer ── */
+.newspaper-footer {
+  border-top: 3px double var(--rule);
+  padding: 8px 24px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--ink-light);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+/* ── Utility ── */
+.error-strip {
+  background: var(--red-ink); color: var(--paper);
+  padding: 10px 24px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 520px) {
+  .row2, .row3 { grid-template-columns: 1fr; }
+  .slider-grid { grid-template-columns: 1fr; }
+  .masthead-flag { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="newspaper">
+
+  <!-- ══ MASTHEAD ══════════════════════════════════════════════════════════ -->
+  <div class="masthead">
+    <div class="masthead-top">
+      <span id="dateStamp">VOL. I · NO. 1</span>
+      <span>ESTABLISHED 2025</span>
+      <span>LOCAL INTELLIGENCE GAZETTE</span>
+    </div>
+    <div class="masthead-flag">本地情报周报</div>
+    <div class="masthead-sub">The Neighbourhood Intelligence Gazette · 只报道真正与你有关的事</div>
+    <div class="masthead-rule"></div>
+    <div class="masthead-rule thick"></div>
+  </div>
+
+  <!-- ══ CONFIG TOGGLE ═════════════════════════════════════════════════════ -->
+  <div class="config-toggle" onclick="toggleConfig(this)">
+    <span>▶ 编辑部配置 · EDITORIAL SETTINGS</span>
+    <span class="config-arrow" id="cfgArrow">▼</span>
+  </div>
+
+  <div class="config-panel" id="cfgPanel">
+
+    <!-- 位置 -->
+    <div class="config-section">
+      <div class="section-label">§ 我的位置 · LOCATION</div>
+      <div class="field">
+        <label>详细地址 STREET ADDRESS</label>
+        <div class="addr-wrap">
+          <input class="pixel-input" type="text" id="address"
+            placeholder="例：北京市朝阳区望京街10号院" autocomplete="off"
+            list="addrHistory">
+          <datalist id="addrHistory"></datalist>
+          <button class="geo-btn" onclick="useMyLocation()" title="GPS定位">⊕</button>
+        </div>
+        <div class="addr-note">※ 离开输入框后自动解析坐标 · 点击 ⊕ 使用 GPS</div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>纬度 LATITUDE</label>
+          <input class="pixel-input" type="number" id="lat" placeholder="39.9042" step="0.0001">
+        </div>
+        <div class="field">
+          <label>经度 LONGITUDE</label>
+          <input class="pixel-input" type="number" id="lon" placeholder="116.4074" step="0.0001">
+        </div>
+      </div>
+      <div class="field">
+        <label>关注半径 RADIUS</label>
+        <div class="radius-display">
+          <input type="range" id="radius" min="1" max="20" value="5"
+            oninput="document.getElementById('radiusVal').textContent=this.value+'km';updateCmd()">
+          <span class="radius-val" id="radiusVal">5km</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Keys -->
+    <div class="config-section">
+      <div class="section-label">§ 记者证 · API CREDENTIALS</div>
+      <div class="row2">
+        <div class="field">
+          <label>DEEPSEEK KEY ★必填</label>
+          <input class="pixel-input" type="password" id="deepseekKey" placeholder="sk-...">
+        </div>
+        <div class="field">
+          <label>OPENWEATHER KEY （可选）</label>
+          <input class="pixel-input" type="password" id="weatherKey" placeholder="留空用模拟数据">
+        </div>
+      </div>
+      <div class="field">
+        <label>NEWSAPI KEY （可选）</label>
+        <input class="pixel-input" type="password" id="newsKey" placeholder="留空用模拟数据">
+      </div>
+    </div>
+
+    <!-- 关注偏好 -->
+    <div class="config-section">
+      <div class="section-label">§ 版面权重 · EDITORIAL WEIGHTS</div>
+      <div class="slider-grid">
+        <div class="slider-row">
+          <label>🏠 房产</label>
+          <input type="range" min="0" max="1" step="0.1" value="0.9"
+            oninput="document.getElementById('v-housing').textContent=parseFloat(this.value).toFixed(1)">
+          <span class="slider-val" id="v-housing">0.9</span>
+        </div>
+        <div class="slider-row">
+          <label>🚗 交通</label>
+          <input type="range" min="0" max="1" step="0.1" value="0.8"
+            oninput="document.getElementById('v-traffic').textContent=parseFloat(this.value).toFixed(1)">
+          <span class="slider-val" id="v-traffic">0.8</span>
+        </div>
+        <div class="slider-row">
+          <label>🛡 安全</label>
+          <input type="range" min="0" max="1" step="0.1" value="1.0"
+            oninput="document.getElementById('v-safety').textContent=parseFloat(this.value).toFixed(1)">
+          <span class="slider-val" id="v-safety">1.0</span>
+        </div>
+        <div class="slider-row">
+          <label>🌿 环境</label>
+          <input type="range" min="0" max="1" step="0.1" value="0.7"
+            oninput="document.getElementById('v-env').textContent=parseFloat(this.value).toFixed(1)">
+          <span class="slider-val" id="v-env">0.7</span>
+        </div>
+        <div class="slider-row">
+          <label>🏪 商业</label>
+          <input type="range" min="0" max="1" step="0.1" value="0.5"
+            oninput="document.getElementById('v-commerce').textContent=parseFloat(this.value).toFixed(1)">
+          <span class="slider-val" id="v-commerce">0.5</span>
+        </div>
+        <div class="slider-row">
+          <label>👥 社区</label>
+          <input type="range" min="0" max="1" step="0.1" value="0.6"
+            oninput="document.getElementById('v-community').textContent=parseFloat(this.value).toFixed(1)">
+          <span class="slider-val" id="v-community">0.6</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模式 -->
+    <div class="config-section">
+      <div class="section-label">§ 版面模式 · EDITION TYPE</div>
+      <div class="mode-tabs">
+        <div class="mode-tab active" data-mode="alert" onclick="selectMode(this)">
+          ⚡ 紧急号外<br><small>高优先级</small>
+        </div>
+        <div class="mode-tab" data-mode="digest" onclick="selectMode(this)">
+          🗞 每日版<br><small>高+中优先</small>
+        </div>
+        <div class="mode-tab" data-mode="weekly" onclick="selectMode(this)">
+          📊 周刊版<br><small>趋势分析</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- CMD -->
+    <div class="config-section">
+      <div class="section-label">§ 印刷机命令 · PRESS COMMAND</div>
+      <div class="cmd-wrap" id="cmdBox">python main.py --lat 39.9042 --lon 116.4074 --radius 5 --mode alert
+        <button class="copy-btn" onclick="copyCmd()">COPY</button>
+      </div>
+      <div style="font-size:9px;color:var(--ink-light);margin-top:6px;font-family:'Courier New',monospace;letter-spacing:1px">
+        ENV: DEEPSEEK_API_KEY · OPENWEATHER_API_KEY · NEWSAPI_KEY
+      </div>
+    </div>
+
+  </div><!-- /config-panel -->
+
+  <!-- ══ PRINT BUTTON ══════════════════════════════════════════════════════ -->
+  <div class="print-btn-wrap">
+    <button class="print-btn" id="runBtn" onclick="runPipeline()">
+      <span id="btnText">[ PRESS TO PRINT · 开始印刷 ]</span>
+    </button>
+  </div>
+
+  <!-- ══ RESULTS ═══════════════════════════════════════════════════════════ -->
+  <div id="results">
+
+    <!-- dateline -->
+    <div class="edition-line">
+      <span id="editionLeft">SPECIAL EDITION</span>
+      <span id="editionDate"></span>
+      <span id="editionRight">PRICE: FREE</span>
+    </div>
+    <div style="text-align:center;font-family:'Courier New',monospace;font-size:9px;
+                letter-spacing:2px;color:var(--ink-light);padding:2px 0 4px;
+                border-bottom:1px solid var(--paper-aged);">
+      <span id="netTimeStatus">NET TIME … 同步中</span>
+    </div>
+
+    <!-- stats ticker -->
+    <div class="ticker" id="ticker">
+      <span class="ticker-item">■ SCANNING…</span>
+    </div>
+
+    <!-- AI summary -->
+    <div class="summary-section">
+      <div class="col-head">编辑手记 · EDITOR'S BRIEFING</div>
+      <div class="summary-text" id="summaryBox">正在排版…</div>
+    </div>
+
+    <div class="section-rule"><hr></div>
+
+    <!-- articles -->
+    <div class="articles-section">
+      <div class="articles-head">
+        <h2>本期要闻 · LOCAL DISPATCHES</h2>
+      </div>
+      <div class="article-grid" id="eventList"></div>
+    </div>
+
+  </div><!-- /results -->
+
+  <!-- ══ FOOTER ═══════════════════════════════════════════════════════════ -->
+  <div class="newspaper-footer">
+    <span>LOCAL INTELLIGENCE GAZETTE</span>
+    <span>POWERED BY DEEPSEEK · DATA: OSM / OPENWEATHER / NEWSAPI</span>
+    <span id="footerDate"></span>
+  </div>
+
+</div><!-- /newspaper -->
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let selectedMode = "alert";
+
+// ── Persistence (localStorage) ────────────────────────────────────────────
+const LS = {
+  ADDR_HISTORY: 'lig_addr_history',   // [{address, lat, lon}, ...]  max 8
+  KEYS:         'lig_api_keys',        // {deepseek, weather, news}
+};
+
+function _lsGet(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+function _lsSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch { /* quota */ }
+}
+
+// ─── API Keys ───────────────────────────────────────────────────────────────
+function saveKeys() {
+  _lsSet(LS.KEYS, {
+    deepseek: document.getElementById('deepseekKey').value.trim(),
+    weather:  document.getElementById('weatherKey').value.trim(),
+    news:     document.getElementById('newsKey').value.trim(),
+  });
+}
+function loadKeys() {
+  const keys = _lsGet(LS.KEYS, {});
+  if (keys.deepseek) document.getElementById('deepseekKey').value = keys.deepseek;
+  if (keys.weather)  document.getElementById('weatherKey').value  = keys.weather;
+  if (keys.news)     document.getElementById('newsKey').value     = keys.news;
+}
+
+// ─── Address History ────────────────────────────────────────────────────────
+function saveAddress(address, lat, lon) {
+  if (!address || address.startsWith('当前位置')) return;
+  let history = _lsGet(LS.ADDR_HISTORY, []);
+  // remove duplicates (same address string)
+  history = history.filter(h => h.address !== address);
+  history.unshift({ address, lat: parseFloat(lat), lon: parseFloat(lon) });
+  if (history.length > 8) history = history.slice(0, 8);
+  _lsSet(LS.ADDR_HISTORY, history);
+  renderAddrHistory(history);
+}
+function renderAddrHistory(history) {
+  const dl = document.getElementById('addrHistory');
+  dl.innerHTML = history.map(h =>
+    `<option value="${h.address}" data-lat="${h.lat}" data-lon="${h.lon}">`
+  ).join('');
+}
+function loadAddrHistory() {
+  const history = _lsGet(LS.ADDR_HISTORY, []);
+  renderAddrHistory(history);
+  // If no current lat/lon, auto-fill with the last used address
+  const lat = document.getElementById('lat').value;
+  if (!lat && history.length > 0) {
+    const last = history[0];
+    document.getElementById('address').value = last.address;
+    document.getElementById('lat').value = last.lat;
+    document.getElementById('lon').value = last.lon;
+    updateCmd();
+  }
+}
+
+// When user picks from datalist, auto-fill lat/lon
+document.getElementById('address').addEventListener('input', function() {
+  const history = _lsGet(LS.ADDR_HISTORY, []);
+  const match = history.find(h => h.address === this.value);
+  if (match) {
+    document.getElementById('lat').value = match.lat;
+    document.getElementById('lon').value = match.lon;
+    updateCmd();
+  }
+});
+
+// Auto-save keys on change
+['deepseekKey','weatherKey','newsKey'].forEach(id =>
+  document.getElementById(id).addEventListener('change', saveKeys)
+);
+
+// ── Network time ──────────────────────────────────────────────────────────
+let _networkNow = null;   // ms timestamp from server
+let _fetchedAt  = null;   // local Date.now() at the moment of fetch
+
+function networkNow() {
+  if (_networkNow === null) return Date.now();          // fallback
+  return _networkNow + (Date.now() - _fetchedAt);       // drift-compensated
+}
+
+async function syncNetworkTime() {
+  const timeEl = document.getElementById('netTimeStatus');
+  try {
+    const res  = await fetch('https://worldtimeapi.org/api/ip', { cache: 'no-store' });
+    const data = await res.json();
+    _networkNow = data.unixtime * 1000;
+    _fetchedAt  = Date.now();
+    const d = new Date(_networkNow);
+    // Update masthead date with authoritative network time
+    const fmt   = d.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+    const fmtEn = d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+    document.getElementById('dateStamp').textContent =
+      `VOL. I · ${d.getFullYear()} NO.${String(d.getMonth()+1).padStart(2,'0')}`;
+    document.getElementById('editionDate').textContent = fmt;
+    document.getElementById('footerDate').textContent  = fmtEn;
+    if (timeEl) timeEl.textContent =
+      `NET TIME ✓ ${d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+  } catch {
+    _networkNow = null;
+    if (timeEl) timeEl.textContent = 'NET TIME ✗ 使用本地时钟';
+  }
+}
+
+// ── Init dates ─────────────────────────────────────────────────────────────
+(function() {
+  const now = new Date();
+  const fmt = now.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+  const fmtEn = now.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+  document.getElementById('dateStamp').textContent =
+    `VOL. I · ${now.getFullYear()} NO.${String(now.getMonth()+1).padStart(2,'0')}`;
+  document.getElementById('editionDate').textContent = fmt;
+  document.getElementById('footerDate').textContent = fmtEn;
+  loadKeys();
+  loadAddrHistory();
+  syncNetworkTime();   // async, updates UI when done
+})();
+
+// ── Config toggle ──────────────────────────────────────────────────────────
+function toggleConfig(el) {
+  const panel = document.getElementById('cfgPanel');
+  const arrow = document.getElementById('cfgArrow');
+  panel.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+// Open by default
+document.getElementById('cfgPanel').classList.add('open');
+document.getElementById('cfgArrow').classList.add('open');
+
+// ── Mode tabs ──────────────────────────────────────────────────────────────
+function selectMode(el) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  selectedMode = el.dataset.mode;
+  updateCmd();
+}
+
+// ── Geolocation ────────────────────────────────────────────────────────────
+function useMyLocation() {
+  if (!navigator.geolocation) { alert('浏览器不支持定位'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.getElementById('lat').value = pos.coords.latitude.toFixed(4);
+    document.getElementById('lon').value = pos.coords.longitude.toFixed(4);
+    document.getElementById('address').value =
+      `当前位置 (${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)})`;
+    updateCmd();
+  }, () => alert('定位失败，请手动填写经纬度'));
+}
+
+// ── Geocode ────────────────────────────────────────────────────────────────
+async function geocodeAddress() {
+  const addr = document.getElementById('address').value.trim();
+  if (!addr || addr.startsWith('当前位置')) return;
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=1`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'zh-CN,zh;q=0.9' } });
+    const data = await res.json();
+    if (data.length > 0) {
+      const lat = parseFloat(data[0].lat).toFixed(4);
+      const lon = parseFloat(data[0].lon).toFixed(4);
+      document.getElementById('lat').value = lat;
+      document.getElementById('lon').value = lon;
+      updateCmd();
+      saveAddress(addr, lat, lon);
+    }
+  } catch(e) { /* silent */ }
+}
+
+document.getElementById('address').addEventListener('blur', geocodeAddress);
+['lat','lon'].forEach(id =>
+  document.getElementById(id).addEventListener('input', updateCmd)
+);
+
+// ── Command builder ────────────────────────────────────────────────────────
+function updateCmd() {
+  const lat = document.getElementById('lat').value || '39.9042';
+  const lon = document.getElementById('lon').value || '116.4074';
+  const r   = document.getElementById('radius').value || '5';
+  const cmd = `python main.py --lat ${lat} --lon ${lon} --radius ${r} --mode ${selectedMode}`;
+  document.getElementById('cmdBox').childNodes[0].textContent = cmd + '\n        ';
+}
+
+function copyCmd() {
+  const text = `python main.py --lat ${document.getElementById('lat').value||'39.9042'} --lon ${document.getElementById('lon').value||'116.4074'} --radius ${document.getElementById('radius').value||'5'} --mode ${selectedMode}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'COPIED ✓';
+    setTimeout(() => btn.textContent = 'COPY', 1800);
+  });
+}
+
+// ── Real API fetchers ──────────────────────────────────────────────────────
+function getInterests() {
+  return {
+    housing:     parseFloat(document.querySelector('[oninput*="v-housing"]').value),
+    traffic:     parseFloat(document.querySelector('[oninput*="v-traffic"]').value),
+    safety:      parseFloat(document.querySelector('[oninput*="v-safety"]').value),
+    environment: parseFloat(document.querySelector('[oninput*="v-env"]').value),
+    commerce:    parseFloat(document.querySelector('[oninput*="v-commerce"]').value),
+    community:   parseFloat(document.querySelector('[oninput*="v-community"]').value),
+  };
+}
+
+function scoreEvents(events, userLat, userLon, interests) {
+  const srcMap = {
+    housing:['housing'], traffic:['traffic'],
+    weather:['environment'], news:['safety','commerce','community'], social:['safety','community']
+  };
+  const hiKw  = ['暴雨','暴雪','台风','预警','封路','火灾','事故','伤亡','停电'];
+  const midKw = ['施工','整修','限行','绕行','上涨','下跌','新政','调整','开业'];
+
+  return events.map(ev => {
+    let geo = 12;
+    if (ev.lat != null) {
+      const d = hav(userLat, userLon, ev.lat, ev.lon);
+      const r = parseFloat(document.getElementById('radius').value);
+      geo = d <= 0.5 ? 30 : d >= r ? 0 : Math.round(30*(1-(d-0.5)/(r-0.5)));
+    }
+    const txt = ev.title+' '+ev.desc;
+    const imp = hiKw.some(k=>txt.includes(k)) ? 30 : midKw.some(k=>txt.includes(k)) ? 18 : 8;
+    const ageH = (networkNow() - new Date(ev.ts).getTime()) / 3600000;
+    const urg = ageH < 1 ? 20 : ageH < 6 ? 15 : ageH < 24 ? 10 : ageH < 72 ? 5 : 2;
+    let best = 0;
+    Object.entries(interests).forEach(([k,w]) => {
+      if ((srcMap[ev.source]||[]).includes(k)) best = Math.max(best,w);
+    });
+    const score = Math.min(100, geo+imp+urg+Math.round(best*20));
+    const level = score>=80?'高':score>=50?'中':'低';
+    return {...ev, score, level};
+  }).sort((a,b)=>b.score-a.score);
+}
+
+function hav(lat1,lon1,lat2,lon2) {
+  const R=6371, r=Math.PI/180;
+  const dl=(lat2-lat1)*r, dL=(lon2-lon1)*r;
+  const a=Math.sin(dl/2)**2+Math.cos(lat1*r)*Math.cos(lat2*r)*Math.sin(dL/2)**2;
+  return R*2*Math.asin(Math.sqrt(a));
+}
+
+// ── Render event articles ──────────────────────────────────────────────────
+function renderEvents(events) {
+  const srcLabel = {
+    weather:'气象台',traffic:'交通局',news:'新闻稿',housing:'房产部',social:'社区'
+  };
+
+  document.getElementById('eventList').innerHTML = events.map(e => {
+    const priClass = e.level==='高'?'pri-high':e.level==='中'?'pri-mid':'';
+    const kickerClass = e.level==='高'?'kicker-high':e.level==='中'?'kicker-mid':'kicker-low';
+    const srcCls = e.level==='高'?'high':e.level==='中'?'mid':'low';
+
+    // score dots (10 dots, filled by score/10)
+    const filled = Math.round(e.score/10);
+    const dots = Array.from({length:10},(_,i) =>
+      `<span class="score-dot ${i<filled?'filled-'+srcCls:''}"></span>`
+    ).join('');
+
+    // title: if has URL, wrap in link
+    const hedContent = e.url
+      ? `<a href="${e.url}" target="_blank" rel="noopener noreferrer">${e.title}</a>`
+      : e.title;
+
+    // search link
+    const searchHref = `https://www.google.com/search?q=${encodeURIComponent(e.searchQuery||e.title)}`;
+
+    // time age label
+    const ageH = (networkNow() - new Date(e.ts).getTime()) / 3600000;
+    let ageLabel, ageStyle = '';
+    if (ageH < 1)       { ageLabel = `${Math.round(ageH*60)}分钟前`; }
+    else if (ageH < 24) { ageLabel = `${Math.round(ageH)}小时前`; }
+    else                { ageLabel = `${Math.round(ageH/24)}天前`; ageStyle = 'color:var(--ink-light);text-decoration:line-through dotted'; }
+    const stale = ageH >= 72
+      ? `<span style="color:var(--ink-light);font-size:.72em;margin-left:4px">[旧闻]</span>`
+      : '';
+
+    return `
+      <div class="article ${priClass}">
+        <div class="article-kicker ${kickerClass}">
+          ${e.level}优先 · ${srcLabel[e.source]||e.source} · SCORE ${e.score} · <span style="${ageStyle}">${ageLabel}</span>${stale}
+        </div>
+        <div class="article-hed">${hedContent}</div>
+        <div class="article-dek">${e.desc}</div>
+        <div class="article-byline">
+          <span><div class="score-dots">${dots}</div></span>
+          <span>
+            <a class="src-link ${srcCls}" href="${searchHref}" target="_blank" rel="noopener">搜索 ↗</a>
+            ${e.url ? `<a class="src-link ${srcCls}" href="${e.url}" target="_blank" rel="noopener" style="margin-left:4px">来源 ↗</a>` : ''}
+          </span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Real API fetchers ──────────────────────────────────────────────────────
+
+async function fetchWeatherReal(lat, lon, key) {
+  const now = networkNow();
+  const ts  = new Date(now).toISOString();
+  try {
+    const [wxRes, aqRes] = await Promise.all([
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${key}&units=metric&lang=zh_cn`),
+      fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${key}`),
+    ]);
+    const events = [];
+
+    if (wxRes.ok) {
+      const wx = await wxRes.json();
+      const desc = wx.weather?.[0]?.description || '';
+      const temp = wx.main?.temp?.toFixed(1) ?? '?';
+      const wind = wx.wind?.speed ?? 0;
+      const city = wx.name || '';
+      events.push({
+        source:'weather', ts,
+        title: `${city ? city+'：' : ''}${desc}，气温${temp}°C`,
+        desc:  `东南风${wind}m/s，湿度${wx.main?.humidity ?? '?'}%`,
+        lat, lon,
+        url: `https://openweathermap.org/city/${wx.id}`,
+        searchQuery: `${city} 天气预报`,
+      });
+      if (wind > 10 || /暴|雷|冰雹|大雨|大雪/.test(desc)) {
+        events.push({
+          source:'weather', ts,
+          title: `⚠ 天气预警：${desc}`,
+          desc:  `风速${wind}m/s，注意出行安全`,
+          lat, lon,
+          url: `https://openweathermap.org/city/${wx.id}`,
+          searchQuery: `${city} 天气预警`,
+        });
+      }
+    }
+
+    if (aqRes.ok) {
+      const aq = await aqRes.json();
+      const aqi = aq.list?.[0]?.main?.aqi;
+      const labels = {1:'优',2:'良',3:'中等',4:'较差',5:'很差'};
+      if (aqi) events.push({
+        source:'weather', ts,
+        title: `空气质量：${labels[aqi]||'?'}（AQI=${aqi}）`,
+        desc:  `PM2.5: ${aq.list?.[0]?.components?.pm2_5?.toFixed(0)??'?'} μg/m³`,
+        lat, lon,
+        url: `https://aqicn.org/`,
+        searchQuery: '今日空气质量',
+      });
+    }
+    return events;
+  } catch(e) {
+    console.warn('Weather API error:', e);
+    return [];
+  }
+}
+
+async function fetchNewsReal(city, key) {
+  const ts = new Date(networkNow()).toISOString();
+  try {
+    const q   = encodeURIComponent(city || '本地');
+    const res = await fetch(
+      `https://newsapi.org/v2/everything?q=${q}&sortBy=publishedAt&pageSize=10&language=zh&apiKey=${key}`
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.articles || [])
+      .filter(a => a.title && a.title !== '[Removed]')
+      .map(a => ({
+        source: 'news',
+        ts: a.publishedAt || ts,
+        title: a.title,
+        desc:  a.description || a.content?.slice(0,80) || '',
+        lat: null, lon: null,
+        url: a.url || null,
+        searchQuery: a.title,
+      }));
+  } catch(e) {
+    console.warn('NewsAPI error:', e);
+    return [];
+  }
+}
+
+async function fetchTrafficReal(lat, lon, radius) {
+  const ts = new Date(networkNow()).toISOString();
+  const r  = Math.round(radius * 1000);
+  const q  = `[out:json][timeout:12];(way["construction"](around:${r},${lat},${lon});way["highway"="construction"](around:${r},${lat},${lon}););out center tags;`;
+  try {
+    const res  = await fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST', body: q,
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.elements || []).slice(0, 6).map(el => {
+      const c   = el.center || {};
+      const tag = el.tags   || {};
+      const name = tag.name || tag.highway || '道路';
+      const d    = hav(lat, lon, c.lat || lat, c.lon || lon).toFixed(1);
+      return {
+        source: 'traffic', ts,
+        title: `施工：${name}（约${d}km）`,
+        desc:  tag.description || tag.note || '道路施工，建议绕行',
+        lat: c.lat || null, lon: c.lon || null,
+        url: `https://www.openstreetmap.org/way/${el.id}`,
+        searchQuery: `${name} 施工 绕行`,
+      };
+    });
+  } catch(e) {
+    console.warn('Overpass error:', e);
+    return [];
+  }
+}
+
+// ── Pipeline ───────────────────────────────────────────────────────────────
+async function runPipeline() {
+  const lat = parseFloat(document.getElementById('lat').value);
+  const lon = parseFloat(document.getElementById('lon').value);
+  const key = document.getElementById('deepseekKey').value.trim();
+
+  if (!lat || !lon) { alert('请先填写地址或经纬度'); return; }
+  if (!key) { alert('请填写 DeepSeek API Key'); return; }
+
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  document.getElementById('btnText').innerHTML = '<span class="pix-loader">[ PRINTING… 印刷中 ]</span>';
+  document.getElementById('results').style.display = 'none';
+
+  try {
+    await sleep(500);
+    // Persist address & keys on every successful run
+    const addr = document.getElementById('address').value || `${lat},${lon}`;
+    saveAddress(addr, lat, lon);
+    saveKeys();
+
+    const radius    = parseFloat(document.getElementById('radius').value);
+    const wxKey     = document.getElementById('weatherKey').value.trim();
+    const newsKey   = document.getElementById('newsKey').value.trim();
+    const addrText  = document.getElementById('address').value.trim();
+    const cityName  = addrText.replace(/市.*|省.*/, '') || addrText;
+
+    // Update status
+    document.getElementById('btnText').innerHTML = '<span class="pix-loader">[ FETCHING… 采集中 ]</span>';
+
+    // Collect from real APIs only
+    const [wxEvents, newsEvents, trafficEvents] = await Promise.all([
+      wxKey   ? fetchWeatherReal(lat, lon, wxKey)   : Promise.resolve([]),
+      newsKey ? fetchNewsReal(cityName, newsKey)     : Promise.resolve([]),
+      fetchTrafficReal(lat, lon, radius),
+    ]);
+
+    const events = [...wxEvents, ...newsEvents, ...trafficEvents];
+
+    if (events.length === 0) {
+      throw new Error('未获取到任何真实数据。请检查 API Key 是否正确，或网络是否可访问。');
+    }
+
+    document.getElementById('btnText').innerHTML = '<span class="pix-loader">[ SCORING… 评分中 ]</span>';
+
+    const scored  = scoreEvents(events, lat, lon, getInterests());
+    const filtered = scored.filter(e => e.level !== '低');
+
+    const nHi  = scored.filter(e=>e.level==='高').length;
+    const nMid = scored.filter(e=>e.level==='中').length;
+    const nLo  = scored.filter(e=>e.level==='低').length;
+
+    document.getElementById('editionLeft').textContent =
+      selectedMode==='alert'?'URGENT EDITION':selectedMode==='weekly'?'WEEKLY DIGEST':'DAILY EDITION';
+    document.getElementById('editionRight').textContent =
+      `RADIUS: ${radius}km · ${addr.substring(0,20)}`;
+
+    const srcTags = [
+      wxEvents.length      ? `🌤天气(${wxEvents.length})`      : null,
+      newsEvents.length    ? `📰新闻(${newsEvents.length})`    : null,
+      trafficEvents.length ? `🚧路况(${trafficEvents.length})` : null,
+    ].filter(Boolean).join(' · ');
+
+    document.getElementById('ticker').innerHTML =
+      `<span class="ticker-item">■ 共采集 ${scored.length} 条</span>` +
+      `<span class="ticker-item ticker-hi">● 高优先 ${nHi}</span>` +
+      `<span class="ticker-item ticker-mid">● 中优先 ${nMid}</span>` +
+      `<span class="ticker-item ticker-lo">● 已过滤 ${nLo}</span>` +
+      (srcTags ? `<span class="ticker-item">■ ${srcTags}</span>` : '');
+
+    renderEvents(filtered);
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('summaryBox').textContent = '正在排版…';
+    document.getElementById('summaryBox').style.columns = '1';
+
+    await callDeepSeek(key, filtered, selectedMode);
+    document.getElementById('summaryBox').style.columns = '';
+
+    // Auto-collapse config after run
+    document.getElementById('cfgPanel').classList.remove('open');
+    document.getElementById('cfgArrow').classList.remove('open');
+
+  } catch(err) {
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('summaryBox').innerHTML =
+      `<div class="error-strip">■ PRESS ERROR: ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    document.getElementById('btnText').textContent = '[ REPRINT · 重新印刷 ]';
+  }
+}
+
+// ── DeepSeek streaming ─────────────────────────────────────────────────────
+async function callDeepSeek(apiKey, events, mode) {
+  const modeInstr = {
+    alert:  '只输出高优先级紧急事项，每条2-3句话，语气紧迫。',
+    digest: '输出完整每日摘要，涵盖所有高/中优先级事项，适合早读。',
+    weekly: '以报纸社论风格，提炼本周房价、治安、城市建设的趋势。',
+  }[mode] || '输出报纸风格的情报简报。';
+
+  const addr = document.getElementById('address').value || '当前区域';
+  const evText = events.map((e,i)=>
+    `[${i+1}] ${e.level}优先 (${e.score}分)\n    ${e.title}\n    ${e.desc}`
+  ).join('\n\n');
+
+  const prompt = `你是一名老派报纸编辑，负责为 "${addr}" 的读者撰写本地情报简报。
+
+以下是经过筛选的本地事件（共${events.length}条）：
+
+${evText}
+
+${modeInstr}
+
+写作要求：
+- 使用报纸社论语气，简洁有力
+- 每条事件：一行标题（可加emoji）+ 一句关联说明 + 必要时加"→ 建议：xxx"
+- 最后写一段"今日总评"（2-3句，有分析深度）
+- 全程中文，避免废话`;
+
+  const summaryBox = document.getElementById('summaryBox');
+  summaryBox.textContent = '';
+
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-reasoner',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 2048,
+      stream: true,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`DeepSeek ${res.status}: ${err.substring(0,200)}`);
+  }
+
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data:')) continue;
+      const d = line.slice(5).trim();
+      if (d === '[DONE]') return;
+      try {
+        const j = JSON.parse(d);
+        const text = j.choices?.[0]?.delta?.content || '';
+        if (text) summaryBox.textContent += text;
+      } catch { /* skip */ }
+    }
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+updateCmd();
+</script>
+</body>
+</html>
