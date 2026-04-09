@@ -130,6 +130,21 @@ Thresholds:
 
 ---
 
+## Work in Progress
+
+This project is under active development. A lot is still missing or rough around the edges.
+
+Planned improvements include:
+
+- **Richer search** — web search integration so the AI can actively look up events rather than relying only on pre-fetched API data
+- **More data sources** — social platforms, government announcements, local forums, real estate feeds
+- **Housing data** — real price and listing data (currently placeholder only)
+- **Better geocoding** — smarter address parsing for non-Chinese cities
+- **Notification support** — push alerts when a high-priority event appears
+- **Scheduled runs** — automatic daily/weekly digest without manual trigger
+
+Contributions and ideas are welcome.
+
 ---
 
 ## 这个项目的起点
@@ -197,6 +212,21 @@ python main.py --mode weekly   # 本周趋势
 - Overpass API 有速率限制，频繁请求可能临时 429
 - DeepSeek 前端直连可能遇到 CORS，建议本地服务器访问
 - `config.json` 已在 `.gitignore` 中排除，API Key 不会上传
+
+## 仍在完善中
+
+这个项目还在持续迭代，很多能力还没有做到位。
+
+计划补充的内容包括：
+
+- **搜索能力** — 接入网络搜索，让 AI 能主动查找事件，而不只依赖预设 API 的数据
+- **更多数据源** — 社交平台、政府公告、本地论坛、房产平台实时数据
+- **房产数据** — 目前仅为占位符，后续接入真实挂牌和成交数据
+- **更智能的地址解析** — 对非中文城市的支持
+- **推送提醒** — 出现高优先级事件时主动通知
+- **定时运行** — 不用手动触发，自动生成每日/每周简报
+
+欢迎提 Issue 或 PR，也欢迎分享你的想法。
 
 ## License
 
